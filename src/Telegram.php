@@ -180,6 +180,13 @@ class Telegram
     protected $last_update_id;
 
     /**
+     * Guzzle request timeout
+     *
+     * @var int
+     */
+    protected $requestTimeout = 0;
+
+    /**
      * The command to be executed when there's a new message update and nothing more suitable is found
      */
     public const GENERIC_MESSAGE_COMMAND = 'genericmessage';
@@ -445,6 +452,16 @@ class Telegram
     }
 
     /**
+     * Get request timeout (Guzzle request timeout)
+     *
+     * @return integer
+     */
+    public function getRequestTimeout(): int
+    {
+      return $this->requestTimeout;
+    }
+
+    /**
      * Handle getUpdates method
      *
      * @todo Remove backwards compatibility for old signature and force $data to be an array.
@@ -455,7 +472,7 @@ class Telegram
      * @return ServerResponse
      * @throws TelegramException
      */
-    public function handleGetUpdates($data = null, ?int $timeout = null): ServerResponse
+    public function handleGetUpdates($data = null, ?int $requestTimeout = null): ServerResponse
     {
         if (empty($this->bot_username)) {
             throw new TelegramException('Bot Username is not defined!');
@@ -471,8 +488,13 @@ class Telegram
             );
         }
 
-        $offset = 0;
-        $limit  = null;
+        if ($requestTimeout) {
+            $this->requestTimeout = $requestTimeout;
+        }
+
+        $offset   = 0;
+        $limit    = null;
+        $timeout  = null;
 
         // By default, get update types sent by Telegram.
         $allowed_updates = [];

@@ -597,7 +597,8 @@ class Request
     {
         $request_params          = self::setUpRequestParams($data);
         $request_params['debug'] = TelegramLog::getDebugLogTempStream();
-
+        $request_params['timeout']  = self::$telegram->getRequestTimeout();
+        
         try {
             $response = self::$client->post(
                 '/bot' . self::$telegram->getApiKey() . '/' . $action,
